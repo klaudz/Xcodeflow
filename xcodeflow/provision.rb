@@ -46,6 +46,11 @@ module Xcodeflow
         private :_load_entitlements
 
         def _load_certificates
+            @certificates = []
+            certificate_data = @hash["DeveloperCertificates"]
+            certificate_data.each { |data|
+                @certificates.push(Certificate.open(data: data))
+            } if certificate_data
         end
         private :_load_certificates
 
