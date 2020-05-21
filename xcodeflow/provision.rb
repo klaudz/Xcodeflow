@@ -1,14 +1,18 @@
 
 require_relative 'certificate'
 require 'CFPropertyList'
+require 'fileutils'
 
 module Xcodeflow
 
     class Provision
 
-        attr_reader :plist, :hash
+        ### Open provision profiles ###
+
+        attr_reader :path, :plist, :hash
         
         def initialize(path)
+            @path = path
             @plist = `security cms -D -i "#{path}"`
             status = $?
             unless status.success?
@@ -53,6 +57,45 @@ module Xcodeflow
             } if certificate_data
         end
         private :_load_certificates
+
+        ### Install provision profiles ###
+
+        def installation_file_name
+            raise "unable to get uuid from the provision" if @uuid.nil?
+            return @uuid + installation_file_extname
+        end
+
+        def installation_file_extname
+            file_ext = File.extname(@path)
+            return file_ext if @platforms.nil? or @platforms.count == 0
+            file_ext_hash = {
+                "iOS" => ".mobileprovision",
+                "OSX" => ".provisionprofile",
+            }
+            file_ext = file_ext_hash[@platforms.first]
+            return file_ext if file_ext
+            file_ext = filefile_ext_hash["iOS"]
+            return file_ext
+        end
+
+        @@provision_dir_path = File.join(Dir.home, "Library/MobileDevice/Provisioning Profiles")
+
+        def self.install_with_provision(provision)
+            FileUtils.mkdir_p(@@provision_dir_path) unless Dir.exist?(@@provision_dir_path)
+            file_name = provision.installation_file_name
+            file_path = File.join(@@provision_dir_path, file_name)
+            if File.file?(file_path)
+                puts "\"#{file_name}\" has already been installed"
+                return
+            end
+            FileUtils.cp(provision.path, file_path)
+            puts "installed \"#{file_name}\" successfully"
+        end
+
+        def self.install_with_path(path)
+            provision = self.open(path)
+            self.install_with_provision(provision)
+        end
 
     end
 end
