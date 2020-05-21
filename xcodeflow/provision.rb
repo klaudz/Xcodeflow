@@ -23,7 +23,7 @@ module Xcodeflow
             self.new(path)
         end
 
-        attr_reader :app_id_name, :app_id, :team_name, :platforms, :uuid, :create_date, :expiration_date
+        attr_reader :app_id_name, :app_id, :team_name, :platforms, :uuid, :creation_date, :expiration_date
         attr_reader :is_xcode_managed
         attr_reader :entitlements
         attr_reader :certificates
@@ -34,7 +34,7 @@ module Xcodeflow
             @team_name = @hash["TeamName"]
             @platforms = @hash["Platform"]
             @uuid = @hash["UUID"]
-            @create_date = @hash["CreationDate"]
+            @creation_date = @hash["CreationDate"]
             @expiration_date = @hash["ExpirationDate"]
             @is_xcode_managed = @hash["IsXcodeManaged"]
         end
