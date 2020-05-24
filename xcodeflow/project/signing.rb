@@ -1,4 +1,5 @@
 
+require_relative '../provision'
 require 'xcodeproj'
 
 module Xcodeflow
@@ -41,6 +42,13 @@ module Xcodeflow
                 @signing_certificate_identity = @build_configuration.resolve_build_setting("CODE_SIGN_IDENTITY")
             end
             private :_load_info
+
+            def update_from_provision(provision)
+                self.team_id = provision.team_id
+                self.bundle_identifier = provision.bundle_identifier
+                self.provision_profile_specifier = provision.app_id_name ? provision.app_id_name : provision.uuid
+                self.signing_certificate_identity = provision.certificates[0].name
+            end
 
         end
     end
