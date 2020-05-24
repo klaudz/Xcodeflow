@@ -16,13 +16,29 @@ module Xcodeflow
                 _load_info
             end
 
-            attr_reader :team_id, :bundle_identifier, :provision_profile, :signing_certificate
+            attr_accessor :team_id, :bundle_identifier, :provision_profile_specifier, :signing_certificate_identity
+            def team_id=(value)
+                @build_configuration.build_settings["DEVELOPMENT_TEAM"] = value
+                @team_id = value
+            end
+            def bundle_identifier=(value)
+                @build_configuration.build_settings["PRODUCT_BUNDLE_IDENTIFIER"] = value
+                @bundle_identifier = value
+            end
+            def provision_profile_specifier=(value)
+                @build_configuration.build_settings["PROVISIONING_PROFILE_SPECIFIER"] = value
+                @provision_profile_specifier = value
+            end
+            def signing_certificate_identity=(value)
+                @build_configuration.build_settings["CODE_SIGN_IDENTITY"] = value
+                @signing_certificate_identity = value
+            end
 
             def _load_info
                 @team_id = @build_configuration.resolve_build_setting("DEVELOPMENT_TEAM")
                 @bundle_identifier = @build_configuration.resolve_build_setting("PRODUCT_BUNDLE_IDENTIFIER")
-                @provision_profile = @build_configuration.resolve_build_setting("PROVISIONING_PROFILE_SPECIFIER")
-                @signing_certificate = @build_configuration.resolve_build_setting("CODE_SIGN_IDENTITY")
+                @provision_profile_specifier = @build_configuration.resolve_build_setting("PROVISIONING_PROFILE_SPECIFIER")
+                @signing_certificate_identity = @build_configuration.resolve_build_setting("CODE_SIGN_IDENTITY")
             end
             private :_load_info
 
