@@ -1,5 +1,7 @@
 
 require 'xcodeproj'
+require_relative 'project/general'
+require_relative 'xcodeproj-extensions/native_target.rb'
 
 module Xcodeflow
 
