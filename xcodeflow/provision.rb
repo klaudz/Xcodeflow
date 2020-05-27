@@ -42,7 +42,7 @@ module Xcodeflow
             @team_name = @hash["TeamName"]
             @team_ids = @hash["TeamIdentifier"]
             @team_id = @team_ids.first if @team_ids
-            @bundle_identifier = @app_id.sub(Regexp.new("^" + @team_id + "."), "") if @app_id and @team_id
+            @bundle_identifier = @app_id.sub(/^\w*\./, "") if @app_id
             @platforms = @hash["Platform"]
             @uuid = @hash["UUID"]
             @creation_date = @hash["CreationDate"]
