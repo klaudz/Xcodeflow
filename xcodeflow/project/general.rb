@@ -16,7 +16,7 @@ module Xcodeflow
                 _load_info
             end
 
-            attr_reader :infoplist_name, :infoplist_path
+            attr_reader :infoplist_name, :infoplist_path, :infoplist
             attr_reader :expand_build_settings_in_infoplist
             attr_reader :display_name, :bundle_identifier, :version, :build
             attr_reader :deployment_target
@@ -51,11 +51,11 @@ module Xcodeflow
                 unless File.file?(path)
                     return
                 end
-                plist = Xcodeproj::Plist.read_from_path(path)
-                @display_name = _resolve_plist_setting(plist, "CFBundleDisplayName")
-                @bundle_identifier = _resolve_plist_setting(plist, "CFBundleIdentifier")
-                @version = _resolve_plist_setting(plist, "CFBundleShortVersionString")
-                @build = _resolve_plist_setting(plist, "CFBundleVersion")
+                @infoplist = Xcodeproj::Plist.read_from_path(path)
+                @display_name = _resolve_plist_setting("CFBundleDisplayName")
+                @bundle_identifier = _resolve_plist_setting("CFBundleIdentifier")
+                @version = _resolve_plist_setting("CFBundleShortVersionString")
+                @build = _resolve_plist_setting("CFBundleVersion")
             end
             private :_load_info_from_infoplist
 
@@ -80,8 +80,8 @@ module Xcodeflow
             end
             private :_load_app_icons
 
-            def _resolve_plist_setting(plist, key)
-                value = plist[key]
+            def _resolve_plist_setting(key)
+                value = @infoplist[key]
                 return value unless @expand_build_settings_in_infoplist
                 return value unless value
                 value.gsub!(/\$\(\w+\)/) { |match|
