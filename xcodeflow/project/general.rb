@@ -17,22 +17,34 @@ module Xcodeflow
             end
 
             attr_reader :infoplist_name, :infoplist_path
+            attr_reader :expand_build_settings_in_infoplist
             attr_reader :display_name, :bundle_identifier, :version, :build
             attr_reader :deployment_target
             attr_reader :app_icons_source, :app_icons_paths
 
             def _load_info
+                _load_info_for_infoplist
+                _load_info_from_infoplist
+                @deployment_target = @build_configuration.resolve_build_setting("IPHONEOS_DEPLOYMENT_TARGET")
+                _load_app_icons
+            end
+            private :_load_info
+
+            def _load_info_for_infoplist
                 @infoplist_name = @build_configuration.resolve_build_setting("INFOPLIST_FILE")
                 # if File.absolute_path?(@infoplist_name)
                     # @infoplist_path = @infoplist_name
                 # else
                     @infoplist_path = File.join(@build_configuration.project.project_dir, @infoplist_name)
                 # end
-                _load_info_from_infoplist
-                @deployment_target = @build_configuration.resolve_build_setting("IPHONEOS_DEPLOYMENT_TARGET")
-                _load_app_icons
+                expand_string = @build_configuration.resolve_build_setting("INFOPLIST_EXPAND_BUILD_SETTINGS")
+                if expand_string.nil? or expand_string == "YES"
+                    @expand_build_settings_in_infoplist = true
+                else
+                    @expand_build_settings_in_infoplist = false
+                end
             end
-            private :_load_info
+            private :_load_info_for_infoplist
 
             def _load_info_from_infoplist
                 path = @infoplist_path
@@ -40,10 +52,10 @@ module Xcodeflow
                     return
                 end
                 plist = Xcodeproj::Plist.read_from_path(path)
-                @display_name = plist["CFBundleDisplayName"]
-                @bundle_identifier = plist["CFBundleIdentifier"]
-                @version = plist["CFBundleShortVersionString"]
-                @build = plist["CFBundleVersion"]
+                @display_name = _resolve_plist_setting(plist, "CFBundleDisplayName")
+                @bundle_identifier = _resolve_plist_setting(plist, "CFBundleIdentifier")
+                @version = _resolve_plist_setting(plist, "CFBundleShortVersionString")
+                @build = _resolve_plist_setting(plist, "CFBundleVersion")
             end
             private :_load_info_from_infoplist
 
@@ -67,6 +79,19 @@ module Xcodeflow
                 end
             end
             private :_load_app_icons
+
+            def _resolve_plist_setting(plist, key)
+                value = plist[key]
+                return value unless @expand_build_settings_in_infoplist
+                return value unless value
+                value.gsub!(/\$\(\w+\)/) { |match|
+                    subkey = /\w+/.match(match)[0]
+                    subvalue = @build_configuration.resolve_build_setting(subkey)
+                    return subvalue
+                }
+                return value
+            end
+            private :_resolve_plist_setting
 
         end
     end
