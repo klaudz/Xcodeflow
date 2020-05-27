@@ -27,7 +27,7 @@ module Xcodeflow
             self.new(path)
         end
 
-        attr_reader :name, :app_id_name, :app_id, :team_name, :team_ids, :team_id, :bundle_identifier
+        attr_reader :name, :app_id_name, :app_id, :app_id_prefixes, :app_id_prefix, :team_name, :team_ids, :team_id, :bundle_identifier
         attr_reader :platforms, :uuid, :creation_date, :expiration_date
         attr_reader :is_xcode_managed
         attr_reader :entitlements
@@ -37,6 +37,8 @@ module Xcodeflow
             @name = @hash["Name"]
             @app_id_name = @hash["AppIDName"]
             @app_id = @hash["Entitlements"]["application-identifier"] if @hash["Entitlements"]
+            @app_id_prefixes = @hash["ApplicationIdentifierPrefix"]
+            @app_id_prefix = @app_id_prefixes.first if @app_id_prefixes
             @team_name = @hash["TeamName"]
             @team_ids = @hash["TeamIdentifier"]
             @team_id = @team_ids.first if @team_ids
