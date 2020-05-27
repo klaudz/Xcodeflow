@@ -46,7 +46,7 @@ module Xcodeflow
             def update_from_provision(provision)
                 self.team_id = provision.team_id
                 self.bundle_identifier = provision.bundle_identifier
-                self.provision_profile_specifier = provision.app_id_name ? provision.app_id_name : provision.uuid
+                self.provision_profile_specifier = provision.name ? provision.name : provision.uuid
                 self.signing_certificate_identity = provision.certificates[0].name
             end
 
