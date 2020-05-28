@@ -9,20 +9,26 @@ module Xcodeproj
 
             class AbstractTarget
 
-                attr_reader :xcf_general
+                @xcf_generals_cache
                 def xcf_general(build_configuration_name)
-                    unless @xcf_general
-                        @xcf_general = Xcodeflow::Project::General.new(self, build_configuration_name)
+                    @xcf_generals_cache = {} unless @xcf_generals_cache
+                    general = @xcf_generals_cache[build_configuration_name]
+                    unless general
+                        general = Xcodeflow::Project::General.new(self, build_configuration_name)
+                        @xcf_generals_cache[build_configuration_name] = general
                     end
-                    @xcf_general
+                    general
                 end
 
-                attr_reader :xcf_signing
+                @xcf_signings_cache
                 def xcf_signing(build_configuration_name)
-                    unless @xcf_signing
-                        @xcf_signing = Xcodeflow::Project::Signing.new(self, build_configuration_name)
+                    @xcf_signings_cache = {} unless @xcf_signings_cache
+                    signing = @xcf_signings_cache[build_configuration_name]
+                    unless signing
+                        signing = Xcodeflow::Project::Signing.new(self, build_configuration_name)
+                        @xcf_signings_cache[build_configuration_name] = signing
                     end
-                    @xcf_signing
+                    signing
                 end
 
             end
