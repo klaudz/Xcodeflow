@@ -2,6 +2,7 @@
 require 'xcodeproj'
 require_relative 'project/general'
 require_relative 'project/signing'
+require_relative 'scheme'
 require_relative 'xcodeproj-extensions/native_target.rb'
 
 module Xcodeflow
@@ -16,8 +17,8 @@ module Xcodeflow
         def xcf_schemes
             scheme_names = Xcodeflow::Project.schemes(@path)
             schemes = scheme_names.map { |name|
-                scheme_path = File.join(Xcodeproj::XCScheme.shared_data_dir(@path), name + ".xcscheme")
-                scheme = Xcodeproj::XCScheme.new(scheme_path)
+                scheme_path = File.join(Xcodeflow::Scheme.shared_data_dir(@path), name + ".xcscheme")
+                scheme = Xcodeflow::Scheme.new(scheme_path, name)
                 scheme
             }
             schemes
