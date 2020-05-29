@@ -24,6 +24,19 @@ module Xcodeflow
             schemes
         end
 
+        def xcf_target_for_scheme(scheme)
+            entries = scheme.build_action.entries
+            return nil if entries.nil? or entries.count == 0
+            buildable_references = entries.first.buildable_references
+            return nil if buildable_references.nil? or buildable_references.count == 0
+            target_name = buildable_references.first.target_name
+            return nil if target_name.nil?
+            target = self.targets.select { |target|
+                target.name == target_name
+            }.first
+            return target
+        end
+
     end
 
 end
