@@ -2,6 +2,7 @@
 require 'xcodeproj'
 require_relative '../project/general'
 require_relative '../project/signing'
+require_relative '../project/build_settings'
 
 module Xcodeproj
     class Project
@@ -29,6 +30,17 @@ module Xcodeproj
                         @xcf_signings_cache[build_configuration_name] = signing
                     end
                     signing
+                end
+
+                @xcf_build_settings_cache
+                def xcf_build_settings(build_configuration_name)
+                    @xcf_build_settings_cache = {} unless @xcf_build_settings_cache
+                    build_settings = @xcf_build_settings_cache[build_configuration_name]
+                    unless build_settings
+                        build_settings = Xcodeflow::Project::BuildSettings.new(self, build_configuration_name)
+                        @xcf_build_settings_cache[build_configuration_name] = build_settings
+                    end
+                    build_settings
                 end
 
             end
