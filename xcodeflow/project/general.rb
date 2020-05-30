@@ -119,7 +119,7 @@ module Xcodeflow
             private :_resolve_infoplist_setting
 
             def _update_infoplist_setting(infoplist_key, build_setting_key, value)
-                infoplist_updated = true
+                @infoplist_updated = true
                 @build_configuration.build_settings[build_setting_key] = value
                 if @expand_build_settings_in_infoplist
                     @infoplist[infoplist_key] = "$(#{build_setting_key})"
