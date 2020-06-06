@@ -31,8 +31,26 @@ module Xcodeflow
             end
 
             def resolve_setting(key)
-                @build_configuration.resolve_build_setting(key)
+                _configurate_product_info_build_settings_in_environment_variables
+                setting = @build_configuration.resolve_build_setting(key, @target)
+                _restore_environment_variables
+                setting
             end
+
+            def _configurate_product_info_build_settings_in_environment_variables
+                # See:
+                #   Product Information Build Settings
+                #   https://developer.apple.com/library/archive/documentation/DeveloperTools/Reference/XcodeBuildSettingRef/1-Build_Setting_Reference/build_setting_ref.html
+                ENV["TARGET_NAME"] = @target.name if @target
+                ENV["PROJECT_DIR"] = @build_configuration.project.project_dir.to_s
+                ENV["EXECUTABLE_NAME"] = "$(EXECUTABLE_PREFIX)$(PRODUCT_NAME)$(EXECUTABLE_SUFFIX)"
+            end
+            def _restore_environment_variables
+                ENV.delete("TARGET_NAME")
+                ENV.delete("EXECUTABLE_NAME")
+                ENV.delete("PROJECT_DIR")
+            end
+            private :_configurate_product_info_build_settings_in_environment_variables, :_restore_environment_variables
 
             def _array_setting(key)
                 setting = self[key]
