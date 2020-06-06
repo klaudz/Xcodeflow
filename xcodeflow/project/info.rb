@@ -44,8 +44,8 @@ module Xcodeflow
                 @info_plist_updated = false
             end
             
-            attr_accessor :expand_build_settings_in_infoplist
-            def expand_build_settings_in_infoplist
+            attr_accessor :expand_build_settings_in_info_plist
+            def expand_build_settings_in_info_plist
                 expand_string = @build_configuration.resolve_build_setting("INFOPLIST_EXPAND_BUILD_SETTINGS")
                 if expand_string.nil? or expand_string == "YES"
                     return true
@@ -53,7 +53,7 @@ module Xcodeflow
                     return false
                 end
             end
-            def expand_build_settings_in_infoplist=(value)
+            def expand_build_settings_in_info_plist=(value)
                 @build_configuration.build_settings["INFOPLIST_EXPAND_BUILD_SETTINGS"] = value.nil? ? nil : (value ? "YES" : "NO")
             end
 
@@ -73,6 +73,18 @@ module Xcodeflow
 
             def set_property(key, property)
                 self[key] = property
+            end
+
+            def resolve_property(key)
+                property = self[key]
+                return property unless self.expand_build_settings_in_info_plist
+                return property unless property
+                property.gsub!(/\$\(\w+\)/) { |match|
+                    resolved_key = /\w+/.match(match)[0]
+                    resolved_property = @build_configuration.resolve_build_setting(resolved_key)
+                    return resolved_property
+                }
+                return property
             end
 
         end
