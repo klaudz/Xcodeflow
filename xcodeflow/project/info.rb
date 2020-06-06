@@ -75,16 +75,16 @@ module Xcodeflow
                 self[key] = property
             end
 
-            def resolve_property(key)
+            def expand_property(key)
                 property = self[key]
                 return property unless self.expand_build_settings_in_info_plist
                 return property unless property
-                property.gsub!(/\$\(\w+\)/) { |match|
-                    resolved_key = /\w+/.match(match)[0]
-                    resolved_property = @build_configuration.resolve_build_setting(resolved_key)
-                    return resolved_property
+                expanded_property = property.gsub(/\$\(\w+\)/) { |match|
+                    expanding_key = /\w+/.match(match)[0]
+                    expanded_property = @build_configuration.resolve_build_setting(expanding_key)
+                    return expanded_property
                 }
-                return property
+                return expanded_property
             end
 
         end
