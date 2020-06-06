@@ -61,18 +61,18 @@ module Xcodeflow
                 return nil unless @info_plist_properties
                 @info_plist_properties[key]
             end
-            def []=(key, value)
+            def []=(key, property)
                 return unless @info_plist_properties
-                @info_plist_properties[key] = value
+                @info_plist_properties[key] = property
                 @info_plist_updated = true
             end
 
-            def value(key)
+            def property(key)
                 self[key]
             end
 
-            def set_value(key, value)
-                self[key] = value
+            def set_property(key, property)
+                self[key] = property
             end
 
         end
