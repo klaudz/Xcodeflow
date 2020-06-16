@@ -33,11 +33,11 @@ class InfoTest < Test::Unit::TestCase
         assert_equal("$(EXECUTABLE_NAME)",              info["CFBundleExecutable"])
 
         assert_equal(nil,                               info.expand_property("CFBundleDisplayName"))
-        # assert_equal("XcodeflowTest",                   info.expand_property("CFBundleName"))
+        assert_equal("XcodeflowTest",                   info.expand_property("CFBundleName"))
         assert_equal("me.klaudz.XcodeflowTest",         info.expand_property("CFBundleIdentifier"))
         assert_equal("1.0",                             info.expand_property("CFBundleShortVersionString"))
         assert_equal("1",                               info.expand_property("CFBundleVersion"))
-        # assert_equal("XcodeflowTest",                   info.expand_property("CFBundleExecutable"))
+        assert_equal("XcodeflowTest",                   info.expand_property("CFBundleExecutable"))
     
     end
 

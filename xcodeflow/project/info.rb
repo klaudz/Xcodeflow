@@ -8,19 +8,21 @@ module Xcodeflow
         class Info
 
             attr_reader :target, :build_configuration
+            @xcf_build_settings
             
             def initialize(target, build_configuration_name)
                 @target = target
                 @build_configuration = target.build_configurations.select { |build_configuration|
                     build_configuration.name == build_configuration_name
                 }.first
+                @xcf_build_settings = @target.xcf_build_settings(build_configuration_name)
                 _load_info
                 _load_properties_from_info_plist
             end
 
             attr_reader :info_plist_file, :info_plist_path
             def _load_info
-                @info_plist_file = @build_configuration.resolve_build_setting("INFOPLIST_FILE")
+                @info_plist_file = @xcf_build_settings.resolve_setting("INFOPLIST_FILE")
                 return unless @info_plist_file
                 @info_plist_path = Pathname.new(@info_plist_file)
                 unless @info_plist_path.absolute?
@@ -46,7 +48,7 @@ module Xcodeflow
             
             attr_accessor :expand_build_settings_in_info_plist
             def expand_build_settings_in_info_plist
-                expand_string = @build_configuration.resolve_build_setting("INFOPLIST_EXPAND_BUILD_SETTINGS")
+                expand_string = @xcf_build_settings.resolve_setting("INFOPLIST_EXPAND_BUILD_SETTINGS")
                 if expand_string.nil? or expand_string == "YES"
                     return true
                 else
@@ -54,7 +56,7 @@ module Xcodeflow
                 end
             end
             def expand_build_settings_in_info_plist=(value)
-                @build_configuration.build_settings["INFOPLIST_EXPAND_BUILD_SETTINGS"] = value.nil? ? nil : (value ? "YES" : "NO")
+                @xcf_build_settings["INFOPLIST_EXPAND_BUILD_SETTINGS"] = value.nil? ? nil : (value ? "YES" : "NO")
             end
 
             def [](key)
@@ -81,7 +83,7 @@ module Xcodeflow
                 return property unless property
                 expanded_property = property.gsub(/\$\(\w+\)/) { |match|
                     expanding_key = /\w+/.match(match)[0]
-                    expanded_property = @build_configuration.resolve_build_setting(expanding_key)
+                    expanded_property = @xcf_build_settings.resolve_setting(expanding_key)
                     return expanded_property
                 }
                 return expanded_property
