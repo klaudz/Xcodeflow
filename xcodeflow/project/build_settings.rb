@@ -31,26 +31,43 @@ module Xcodeflow
             end
 
             def resolve_setting(key)
-                _configurate_product_info_build_settings_in_environment_variables
+                temp_build_setting_keys = _configure_product_info_build_settings_temporarily
                 setting = @build_configuration.resolve_build_setting(key, @target)
-                _restore_environment_variables
+                _restore_build_settings(temp_build_setting_keys)
                 setting
             end
 
-            def _configurate_product_info_build_settings_in_environment_variables
+            def _configure_product_info_build_settings_temporarily
+                temp_build_setting_keys = []
                 # See:
                 #   Product Information Build Settings
                 #   https://developer.apple.com/library/archive/documentation/DeveloperTools/Reference/XcodeBuildSettingRef/1-Build_Setting_Reference/build_setting_ref.html
-                ENV["TARGET_NAME"] = @target.name if @target
-                ENV["PROJECT_DIR"] = @build_configuration.project.project_dir.to_s
-                ENV["EXECUTABLE_NAME"] = "$(EXECUTABLE_PREFIX)$(PRODUCT_NAME)$(EXECUTABLE_SUFFIX)"
+
+                # TARGET_NAME
+                if @build_configuration.resolve_build_setting("TARGET_NAME", @target).nil? and @target
+                    @build_configuration.build_settings["TARGET_NAME"] = @target.name
+                    temp_build_setting_keys.push("TARGET_NAME")
+                end
+                # PROJECT_DIR
+                if @build_configuration.resolve_build_setting("PROJECT_DIR", @target).nil?
+                    @build_configuration.build_settings["PROJECT_DIR"] = @build_configuration.project.project_dir.to_s
+                    temp_build_setting_keys.push("PROJECT_DIR")
+                end
+                # EXECUTABLE_NAME
+                if @build_configuration.resolve_build_setting("EXECUTABLE_NAME", @target).nil?
+                    @build_configuration.build_settings["EXECUTABLE_NAME"] = "$(EXECUTABLE_PREFIX)$(PRODUCT_NAME)$(EXECUTABLE_SUFFIX)"
+                    temp_build_setting_keys.push("EXECUTABLE_NAME")
+                end
+
+                return temp_build_setting_keys
             end
-            def _restore_environment_variables
-                ENV.delete("TARGET_NAME")
-                ENV.delete("EXECUTABLE_NAME")
-                ENV.delete("PROJECT_DIR")
+            def _restore_build_settings(temp_build_setting_keys)
+                return if temp_build_setting_keys.nil?
+                temp_build_setting_keys.each { |key|
+                    @build_configuration.build_settings.delete(key)
+                }
             end
-            private :_configurate_product_info_build_settings_in_environment_variables, :_restore_environment_variables
+            private :_configure_product_info_build_settings_temporarily, :_restore_build_settings
 
             def _array_setting(key)
                 setting = self[key]
