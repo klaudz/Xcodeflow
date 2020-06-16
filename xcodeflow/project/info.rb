@@ -77,7 +77,7 @@ module Xcodeflow
                 self[key] = property
             end
 
-            def expand_property(key)
+            def resolve_property(key)
                 property = self[key]
                 return property unless self.expand_build_settings_in_info_plist
                 return property unless property
