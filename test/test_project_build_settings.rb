@@ -23,12 +23,29 @@ class BuildSettingsTest < Test::Unit::TestCase
         assert_not_nil(build_settings)
     
         assert_equal("TestValue",                   build_settings["TEST_ORIGINAL_VALUE"])
-        assert_equal("$(TEST_ORIGINAL_VALUE)",      build_settings["TEST_EXPANDABLE_VALUE"])
-        assert_equal("$(TEST_EXPANDABLE_VALUE)",    build_settings["TEST_RECURSIVE_EXPANDABLE_VALUE"])
+        assert_equal("$(TEST_ORIGINAL_VALUE)",      build_settings["TEST_EXPANDABLE_VALUE_NONRECURSIVE"])
+        assert_equal("$(TEST_EXPANDABLE_VALUE_NONRECURSIVE)", build_settings["TEST_EXPANDABLE_VALUE_RECURSIVE"])
 
         assert_equal("TestValue",                   build_settings.resolve_setting("TEST_ORIGINAL_VALUE"))
-        assert_equal("TestValue",                   build_settings.resolve_setting("TEST_EXPANDABLE_VALUE"))
-        assert_equal("TestValue",                   build_settings.resolve_setting("TEST_RECURSIVE_EXPANDABLE_VALUE"))
+        assert_equal("TestValue",                   build_settings.resolve_setting("TEST_EXPANDABLE_VALUE_NONRECURSIVE"))
+        assert_equal("TestValue",                   build_settings.resolve_setting("TEST_EXPANDABLE_VALUE_RECURSIVE"))
+    
+    end
+
+    def test_get_build_settings_for_expandable_values_of_various_styles
+    
+        build_settings = @target.xcf_build_settings("Release")
+        assert_not_nil(build_settings)
+    
+        assert_equal("TestValue",                   build_settings["TEST_ORIGINAL_VALUE"])
+        assert_equal("$(TEST_ORIGINAL_VALUE)",      build_settings["TEST_EXPANDABLE_VALUE_WITH_PARENTHESES"])
+        assert_equal("${TEST_ORIGINAL_VALUE}",      build_settings["TEST_EXPANDABLE_VALUE_WITH_BRACES"])
+        assert_equal("$TEST_ORIGINAL_VALUE",        build_settings["TEST_EXPANDABLE_VALUE_WITHOUT_BRACKETS"])
+
+        assert_equal("TestValue",                   build_settings.resolve_setting("TEST_ORIGINAL_VALUE"))
+        assert_equal("TestValue",                   build_settings.resolve_setting("TEST_EXPANDABLE_VALUE_WITH_PARENTHESES"))
+        assert_equal("TestValue",                   build_settings.resolve_setting("TEST_EXPANDABLE_VALUE_WITH_BRACES"))
+        # assert_equal("TestValue",                   build_settings.resolve_setting("TEST_EXPANDABLE_VALUE_WITHOUT_BRACKETS"))     # Failed, Xcodeproj cannot expand this style
     
     end
 
