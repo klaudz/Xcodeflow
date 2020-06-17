@@ -2,6 +2,20 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>XCFTestOriginalValue</key>
+	<string>TestValue</string>
+	<key>XCFTestExpandableValueNonrecursive</key>
+	<string>$(TEST_ORIGINAL_VALUE)</string>
+	<key>XCFTestExpandableValueRecursive</key>
+	<string>$(TEST_EXPANDABLE_VALUE_NONRECURSIVE)</string>
+	<key>XCFTestExpandableValueWithParentheses</key>
+	<string>$(TEST_ORIGINAL_VALUE)</string>
+	<key>XCFTestExpandableValueWithBraces</key>
+	<string>${TEST_ORIGINAL_VALUE}</string>
+	<key>XCFTestExpandableValueWithoutBrackets</key>
+	<string>$TEST_ORIGINAL_VALUE</string>
+	<key>XCFTestExpandableValueGroup</key>
+	<string>TestValue_$(TEST_ORIGINAL_VALUE)_$(TEST_EXPANDABLE_VALUE_NONRECURSIVE)</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleExecutable</key>

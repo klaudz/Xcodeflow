@@ -7,20 +7,19 @@ class InfoTest < Test::Unit::TestCase
 
     @project_path
     @project
+    @target
 
     def setup
         @project_path = File.join(__dir__, "TestProject/XcodeflowTest.xcodeproj")
         @project = Xcodeflow::Project.open(@project_path)
+        @target = @project.targets.select { |target|
+            target.name == "XcodeflowTest"
+        }.first
     end
 
     def test_get_info
 
-        target = @project.targets.select { |target|
-            target.name == "XcodeflowTest"
-        }.first
-        assert_not_nil(target)
-    
-        info = target.xcf_info("Release")
+        info = @target.xcf_info("Release")
         assert_not_nil(info)
     
         assert_equal("XcodeflowTest/Info.plist",        info.info_plist_file)
@@ -39,6 +38,38 @@ class InfoTest < Test::Unit::TestCase
         assert_equal("1",                               info.resolve_property("CFBundleVersion"))
         assert_equal("XcodeflowTest",                   info.resolve_property("CFBundleExecutable"))
     
+    end
+
+    def test_get_info_for_original_and_expandable_values
+
+        info = @target.xcf_info("Release")
+        assert_not_nil(info)
+
+        assert_equal("TestValue",                       info["XCFTestOriginalValue"])
+        assert_equal("$(TEST_ORIGINAL_VALUE)",          info["XCFTestExpandableValueNonrecursive"])
+        assert_equal("$(TEST_EXPANDABLE_VALUE_NONRECURSIVE)", info["XCFTestExpandableValueRecursive"])
+        
+        assert_equal("TestValue",                       info.resolve_property("XCFTestOriginalValue"))
+        assert_equal("TestValue",                       info.resolve_property("XCFTestExpandableValueNonrecursive"))
+        assert_equal("TestValue",                       info.resolve_property("XCFTestExpandableValueRecursive"))
+
+    end
+
+    def test_get_info_for_expandable_values_of_various_styles
+
+        info = @target.xcf_info("Release")
+        assert_not_nil(info)
+
+        assert_equal("TestValue",                       info["XCFTestOriginalValue"])
+        assert_equal("$(TEST_ORIGINAL_VALUE)",          info["XCFTestExpandableValueWithParentheses"])
+        assert_equal("${TEST_ORIGINAL_VALUE}",          info["XCFTestExpandableValueWithBraces"])
+        assert_equal("$TEST_ORIGINAL_VALUE",            info["XCFTestExpandableValueWithoutBrackets"])
+        
+        assert_equal("TestValue",                       info.resolve_property("XCFTestOriginalValue"))
+        assert_equal("TestValue",                       info.resolve_property("XCFTestExpandableValueWithParentheses"))
+        assert_equal("TestValue",                       info.resolve_property("XCFTestExpandableValueWithBraces"))
+        assert_equal("TestValue",                       info.resolve_property("XCFTestExpandableValueWithoutBrackets"))
+
     end
 
 end
