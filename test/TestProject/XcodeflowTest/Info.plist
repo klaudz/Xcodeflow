@@ -14,7 +14,7 @@
 	<string>${TEST_ORIGINAL_VALUE}</string>
 	<key>XCFTestExpandableValueWithoutBrackets</key>
 	<string>$TEST_ORIGINAL_VALUE</string>
-	<key>XCFTestExpandableValueGroup</key>
+	<key>XCFTestExpandableValueCombination</key>
 	<string>TestValue_$(TEST_ORIGINAL_VALUE)_$(TEST_EXPANDABLE_VALUE_NONRECURSIVE)</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>

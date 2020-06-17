@@ -72,4 +72,16 @@ class InfoTest < Test::Unit::TestCase
 
     end
 
+    def test_get_info_for_expandable_values_in_combination
+
+        info = @target.xcf_info("Release")
+        assert_not_nil(info)
+
+        assert_equal("TestValue_$(TEST_ORIGINAL_VALUE)_$(TEST_EXPANDABLE_VALUE_NONRECURSIVE)",
+                                                        info["XCFTestExpandableValueCombination"])
+        
+        assert_equal("TestValue_TestValue_TestValue",   info.resolve_property("XCFTestExpandableValueCombination"))
+
+    end
+
 end
