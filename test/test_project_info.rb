@@ -13,7 +13,7 @@ class InfoTest < Test::Unit::TestCase
         @project = Xcodeflow::Project.open(@project_path)
     end
 
-    def test_get_signing
+    def test_get_info
 
         target = @project.targets.select { |target|
             target.name == "XcodeflowTest"
