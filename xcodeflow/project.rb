@@ -9,20 +9,36 @@ module Xcodeflow
 
     class Project < Xcodeproj::Project
         
-        def xcf_scheme_names
-            scheme_names = Xcodeflow::Project.schemes(@path)
-            scheme_names
+        #pragma mark - Schemes
+
+        def xcf_shared_schemes
+            _xcf_schemes_in_dir(Xcodeflow::Scheme.shared_data_dir(@path))
         end
 
-        def xcf_schemes
-            scheme_names = Xcodeflow::Project.schemes(@path)
-            schemes = scheme_names.map { |name|
-                scheme_path = File.join(Xcodeflow::Scheme.shared_data_dir(@path), name + ".xcscheme")
+        def xcf_user_schemes(user = nil)
+            _xcf_schemes_in_dir(Xcodeflow::Scheme.user_data_dir(@path, user))
+        end
+
+        def xcf_current_user_schemes(create_unless_exists = false)
+            schemes = _xcf_schemes_in_dir(Xcodeflow::Scheme.user_data_dir(@path))
+            return schemes unless create_unless_exists
+            return schemes if schemes.count > 0
+            recreate_user_schemes
+            schemes = _xcf_schemes_in_dir(Xcodeflow::Scheme.user_data_dir(@path))
+            return schemes
+        end
+
+        def _xcf_schemes_in_dir(xcschemes_dir)
+            schemes = Dir[File.join(xcschemes_dir, "*.xcscheme")].map { |scheme_path|
+                name = File.basename(scheme_path, '.xcscheme')
                 scheme = Xcodeflow::Scheme.new(scheme_path, name)
                 scheme
             }
             schemes
         end
+        private :_xcf_schemes_in_dir
+
+        #pragma mark - Schemes to Targets
 
         def xcf_target_for_scheme(scheme)
             entries = scheme.build_action.entries
