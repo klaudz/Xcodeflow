@@ -45,6 +45,13 @@ module Xcodeflow
                 settings
             end
 
+            def set_all_conditional_settings(key, value)
+                new_value = value
+                self.each_conditional_setting(key) { |conditional_key, condition, conditional_value|
+                    self.set_setting(conditional_key, new_value)
+                }
+            end
+
             def resolve_setting(key)
                 temp_build_setting_keys = _configure_product_info_build_settings_temporarily
                 setting = @build_configuration.resolve_build_setting(key, @target)
