@@ -30,11 +30,17 @@ module Xcodeflow
                 self[key] = value
             end
 
-            def each_conditional_setting(key) # { |conditional_key, value| }
+            def each_conditional_setting(key) # { |key, condition, value| }
+                regexp = /^#{key}(?:\[(.+)\])?$/
                 settings = @build_configuration.build_settings.select { |k, v|
-                    k =~ /^#{key}(\[(.+)\])?$/
-                }.each { |conditional_key, value|
-                    yield(conditional_key, value)
+                    match_data = k.match(regexp)
+                    if match_data.nil?
+                        false
+                    else
+                        condition = match_data[1]
+                        yield(k, condition, v)
+                        true
+                    end
                 }
                 settings
             end

@@ -90,11 +90,34 @@ class BuildSettingsTest < Test::Unit::TestCase
         build_settings = @target.xcf_build_settings("Release")
         assert_not_nil(build_settings)
 
+        keys = []
+        conditions = []
+        values = []
+        settings = build_settings.each_conditional_setting("TEST_CONDITIONAL_SETTING") { |key, condition, value|
+            keys.push(key)
+            conditions.push(condition)
+            values.push(value)
+        }
         assert_equal({
             "TEST_CONDITIONAL_SETTING" => "TestValue",
             "TEST_CONDITIONAL_SETTING[sdk=iphoneos*]" => "TestValue [sdk=iphoneos*]",
-            "TEST_CONDITIONAL_SETTING[sdk=iphonesimulator*]" => "TestValue [sdk=iphonesimulator*]"
-        }, build_settings.each_conditional_setting("TEST_CONDITIONAL_SETTING") { |conditional_key, value| })
+            "TEST_CONDITIONAL_SETTING[sdk=iphonesimulator*]" => "TestValue [sdk=iphonesimulator*]",
+        }, settings)
+        assert_equal([
+            "TEST_CONDITIONAL_SETTING",
+            "TEST_CONDITIONAL_SETTING[sdk=iphoneos*]",
+            "TEST_CONDITIONAL_SETTING[sdk=iphonesimulator*]",
+        ], keys)
+        assert_equal([
+            nil,
+            "sdk=iphoneos*",
+            "sdk=iphonesimulator*",
+        ], conditions)
+        assert_equal([
+            "TestValue",
+            "TestValue [sdk=iphoneos*]",
+            "TestValue [sdk=iphonesimulator*]",
+        ], values)
 
     end
 
