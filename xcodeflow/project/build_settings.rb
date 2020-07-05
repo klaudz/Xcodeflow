@@ -30,6 +30,15 @@ module Xcodeflow
                 self[key] = value
             end
 
+            def each_conditional_setting(key) # { |conditional_key, value| }
+                settings = @build_configuration.build_settings.select { |k, v|
+                    k =~ /^#{key}(\[(.+)\])?$/
+                }.each { |conditional_key, value|
+                    yield(conditional_key, value)
+                }
+                settings
+            end
+
             def resolve_setting(key)
                 temp_build_setting_keys = _configure_product_info_build_settings_temporarily
                 setting = @build_configuration.resolve_build_setting(key, @target)
