@@ -30,6 +30,9 @@ module Xcodeflow
             def team_id=(value)
                 @xcf_build_settings["DEVELOPMENT_TEAM"] = value
             end
+            def all_team_ids=(value)
+                @xcf_build_settings.set_all_conditional_settings("DEVELOPMENT_TEAM", value)
+            end
 
             attr_accessor :bundle_identifier
             def bundle_identifier
@@ -40,6 +43,9 @@ module Xcodeflow
             end
             def bundle_identifier=(value)
                 @xcf_build_settings["PRODUCT_BUNDLE_IDENTIFIER"] = value
+            end
+            def all_bundle_identifiers=(value)
+                @xcf_build_settings.set_all_conditional_settings("PRODUCT_BUNDLE_IDENTIFIER", value)
             end
 
             attr_accessor :provision_profile_specifier
@@ -52,6 +58,9 @@ module Xcodeflow
             def provision_profile_specifier=(value)
                 @xcf_build_settings["PROVISIONING_PROFILE_SPECIFIER"] = value
             end
+            def all_provision_profile_specifiers=(value)
+                @xcf_build_settings.set_all_conditional_settings("PROVISIONING_PROFILE_SPECIFIER", value)
+            end
 
             attr_accessor :signing_certificate_identity
             def signing_certificate_identity
@@ -62,6 +71,9 @@ module Xcodeflow
             end
             def signing_certificate_identity=(value)
                 @xcf_build_settings["CODE_SIGN_IDENTITY"] = value
+            end
+            def all_signing_certificate_identities=(value)
+                @xcf_build_settings.set_all_conditional_settings("CODE_SIGN_IDENTITY", value)
             end
 
             attr_accessor :auto_manage_signing
@@ -80,10 +92,10 @@ module Xcodeflow
             #pragma mark - Helpers
 
             def update_from_provision(provision)
-                self.team_id = provision.team_id
-                self.bundle_identifier = provision.bundle_identifier
-                self.provision_profile_specifier = provision.name ? provision.name : provision.uuid
-                self.signing_certificate_identity = provision.certificates[0].name
+                self.all_team_ids = provision.team_id
+                self.all_bundle_identifiers = provision.bundle_identifier
+                self.all_provision_profile_specifiers = provision.name ? provision.name : provision.uuid
+                self.all_signing_certificate_identities = provision.certificates[0].name
                 self.auto_manage_signing = provision.is_xcode_managed
             end
 
