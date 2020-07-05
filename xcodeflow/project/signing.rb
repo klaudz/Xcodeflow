@@ -22,6 +22,9 @@ module Xcodeflow
 
             attr_accessor :team_id
             def team_id
+                @xcf_build_settings.each_conditional_setting("DEVELOPMENT_TEAM") { |key, condition, value|
+                    yield(condition, value)
+                } if block_given?
                 @xcf_build_settings.resolve_setting("DEVELOPMENT_TEAM")
             end
             def team_id=(value)
@@ -30,6 +33,9 @@ module Xcodeflow
 
             attr_accessor :bundle_identifier
             def bundle_identifier
+                @xcf_build_settings.each_conditional_setting("PRODUCT_BUNDLE_IDENTIFIER") { |key, condition, value|
+                    yield(condition, value)
+                } if block_given?
                 @xcf_build_settings.resolve_setting("PRODUCT_BUNDLE_IDENTIFIER")
             end
             def bundle_identifier=(value)
@@ -38,6 +44,9 @@ module Xcodeflow
 
             attr_accessor :provision_profile_specifier
             def provision_profile_specifier
+                @xcf_build_settings.each_conditional_setting("PROVISIONING_PROFILE_SPECIFIER") { |key, condition, value|
+                    yield(condition, value)
+                } if block_given?
                 @xcf_build_settings.resolve_setting("PROVISIONING_PROFILE_SPECIFIER")
             end
             def provision_profile_specifier=(value)
@@ -46,6 +55,9 @@ module Xcodeflow
 
             attr_accessor :signing_certificate_identity
             def signing_certificate_identity
+                @xcf_build_settings.each_conditional_setting("CODE_SIGN_IDENTITY") { |key, condition, value|
+                    yield(condition, value)
+                } if block_given?
                 @xcf_build_settings.resolve_setting("CODE_SIGN_IDENTITY")
             end
             def signing_certificate_identity=(value)

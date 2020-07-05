@@ -11,16 +11,14 @@ class SigningTest < Test::Unit::TestCase
     def setup
         @project_path = File.join(__dir__, "TestProject/XcodeflowTest.xcodeproj")
         @project = Xcodeflow::Project.open(@project_path)
+        @target = @project.targets.select { |target|
+            target.name == "XcodeflowTest"
+        }.first
     end
 
     def test_get_signing
-
-        target = @project.targets.select { |target|
-            target.name == "XcodeflowTest"
-        }.first
-        assert_not_nil(target)
     
-        signing = target.xcf_signing("Release")
+        signing = @target.xcf_signing("Release")
         assert_not_nil(signing)
     
         assert_equal("3VR2JM3236",              signing.team_id)
@@ -29,6 +27,22 @@ class SigningTest < Test::Unit::TestCase
         assert_equal("iPhone Distribution",     signing.signing_certificate_identity)
         assert_equal(true,                      signing.auto_manage_signing)
     
+    end
+
+    def test_signing_with_conditions
+
+        signing = @target.xcf_signing("Release")
+        assert_not_nil(signing)
+
+        signing_certificate_identity_dict = {}
+        signing.signing_certificate_identity { |condition, value|
+            signing_certificate_identity_dict[condition] = value
+        }
+        assert_equal({
+            nil => "iPhone Distribution",
+            "sdk=iphonesimulator*" => "Apple Distribution: Klaudz Liang (3VR2JM3236)"
+        }, signing_certificate_identity_dict)
+
     end
 
 end
