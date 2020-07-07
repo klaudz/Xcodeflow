@@ -47,6 +47,7 @@ module Xcodeflow
 
             def set_all_conditional_settings(key, value)
                 new_value = value
+                self.set_setting(key, new_value)
                 self.each_conditional_setting(key) { |conditional_key, condition, conditional_value|
                     self.set_setting(conditional_key, new_value)
                 }
