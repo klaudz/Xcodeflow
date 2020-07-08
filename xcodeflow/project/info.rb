@@ -77,6 +77,11 @@ module Xcodeflow
                 self[key] = property
             end
 
+            def delete_property(key)
+                @info_plist_properties.delete(key)
+                @info_plist_updated = true
+            end
+
             def resolve_property(key)
                 property = self[key]
                 return property unless self.expand_build_settings_in_info_plist
