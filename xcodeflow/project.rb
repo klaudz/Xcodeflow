@@ -2,6 +2,8 @@
 require 'xcodeproj'
 require_relative 'project/general'
 require_relative 'project/signing'
+require_relative 'project/info'
+require_relative 'project/build_settings'
 require_relative 'scheme'
 require_relative 'xcodeproj-extensions/native_target.rb'
 
